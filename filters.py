@@ -109,14 +109,28 @@ class Kernel:
 # https://stackoverflow.com/questions/39772796/min-max-avg-filters-in-opencv2-4-13/39778555
 
 class FunctionFilter:
+    '''Superclass for filters that return the function that executes theirselves'''
     def __init__(self, apply):
+        '''Generates the FunctionFilter object
+
+        Args:
+            apply (function): function that is executed to apply the filter
+        '''
         self.apply = apply    #function to be executed to apply filter
-    pass
 
 class NonLinear(FunctionFilter):
+    '''Class for non-linear filters. Each filter returns the function that applies it    '''
 
     @classmethod
     def median(cls, size):
+        '''Median filter
+
+        Args:
+            size (int): Kernel size
+
+        Returns:
+            function: medianBlur function
+        '''
         def apply(img):
             return cv.medianBlur(img.img, size)
         return cls(apply)
