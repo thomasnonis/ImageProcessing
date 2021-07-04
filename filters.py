@@ -205,9 +205,19 @@ class Morph(FunctionFilter):
         return cls(apply)
 
 class EdgeDetection(FunctionFilter):
+    '''Class for edge detection filters. Each filter returns the function that applies it'''
 
     @classmethod
     def canny(cls, min, max):
+        '''Canny edge detection algorithm
+
+        Args:
+            min (float): min value for the hysteresis thresholding criteria
+            max (float): max value for the hysteresis thresholding criteria
+
+        Returns:
+            EdgeDetection: EdgeDetection filter object with the correct apply function set as argument
+        '''
     # def canny(cls, min, max, kernel_size = 3, L2gradient: bool = False):
         # default values are the same default values of cv.Canny()
         def apply(img):
