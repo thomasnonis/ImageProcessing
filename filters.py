@@ -2,10 +2,19 @@ import numpy as np
 import cv2 as cv
 
 class Kernel:
-    # Class for filters that can be computed via convolution
-    # Every classmethod returns a kernel
+    '''Class for filters represented by a kernel matrix, that can be computed via convolution.'''
 
     def __init__(self, kernel, sep_kernel_x = None, sep_kernel_y = None):
+        '''Constructs the Kernel object from a kernel matrix and, optionally, from its separated form.
+
+        If the separated kernel components are not passed and the kernel is separable,
+        the constructor will generate the components by applying SVD decomposition.
+
+        Args:
+            kernel (list | array): Matrix of the kernel
+            sep_kernel_x (list | array, optional): X component of the separable kernel. Defaults to None.
+            sep_kernel_y (list | array, optional): Y component of the separable kernel. Defaults to None.
+        '''
         self.kernel = kernel
         self.is_auto_separated = False  #to keep track of whether the user provided separated filter
         if(sep_kernel_x is None and sep_kernel_y is None and self.is_separable()):
@@ -17,13 +26,25 @@ class Kernel:
             
 
     def is_separable(self):
+        '''Check whether the kernel is separable
+
+        Returns:
+            bool: True if the kernel is separable, False otherwise
+        '''
         if(np.linalg.matrix_rank(self.kernel) > 1):
             return False
         return True
 
     def decompose(self):
-        # TODO: check sign of kernels. Sometimes sign has the correct sign, sometimes not
-        # (sign of eigenvector is irrelevant, but influences filter directionality (if not abs()))
+        '''Computes the SVD decomposition of the matrix,returning the 2 components
+        of the separated kernel.
+
+        Note: Because of the irrelevance of the eigenvalues' sign, the sign of the returned matrices
+        might not be always correct. Filter directionality might be affected.
+
+        Returns:
+            (list, list): 2 element tuple with the x and y separated kernel components respectively.
+        '''
         U, S, V = np.linalg.svd(self.kernel)
         sep_kernel_x = -V[0,:] * np.sqrt(S[0])
         sep_kernel_y = -U[:,0][:,None] * np.sqrt(S[0])  #[:,None] does the transposition
@@ -34,6 +55,17 @@ class Kernel:
     ############################################
 
     def __mul__(self, coeff: float):
+        '''Multiplication operator overload
+
+        Multiplies the kernel matrices by the coefficient passed as argument.
+        Note: Both the kernel and its separated components are multiplied by the same amount.
+
+        Args:
+            coeff (float): Multiplication coefficient
+
+        Returns:
+            Kernel: self
+        '''
         self.kernel *= coeff
         if self.sep_kernel_y is not None and self.sep_kernel_x is not None:
             self.sep_kernel_x *= coeff
@@ -46,6 +78,16 @@ class Kernel:
 
     @classmethod
     def LPF(cls, size: int):
+        '''LPF or MA filter
+
+        Generates an instance of a LPF kernel of the specified size
+
+        Args:
+            size (int): Size of the square kernel
+
+        Returns:
+            Kernel: LPF Kernel
+        '''
         if (size % 2 == 0):
             print("Warning: Kernel size is even (" + str(size) + ")")
 
@@ -56,6 +98,16 @@ class Kernel:
 
     @classmethod
     def HPF(cls, size: int):
+        '''HPF filter
+
+        Generates an instance of a HPF kernel of the specified size
+
+        Args:
+            size (int): Size of the square kernel
+
+        Returns:
+            Kernel: HPF Kernel
+        '''
         if (size % 2 == 0):
             print("Warning: Kernel size is even (" + str(size) + ")")
 
@@ -66,6 +118,17 @@ class Kernel:
 
     @classmethod
     def gaussian(cls, size: int, sigma: float):
+        '''Gaussian LPF filter
+
+        Generates an instance of a gaussian LPF kernel of the specified size
+
+        Args:
+            size (int): Size of the square kernel
+            sigma (float): Standard deviation of the gaussian curve
+
+        Returns:
+            Kernel: Gaussian LPF Kernel
+        '''
         if (size % 2 == 0):
             print("Warning: Kernel size is even (" + str(size) + ")")
 
@@ -77,6 +140,16 @@ class Kernel:
     
     @classmethod
     def crispening(cls, size: int):
+        '''Crispening filter
+
+        Generates an instance of a crispening filter kernel of the specified size
+
+        Args:
+            size (int): Size of the square kernel
+
+        Returns:
+            Kernel: Crispening filter Kernel
+        '''
         if (size % 2 == 0):
             print("Warning: Kernel size is even (" + str(size) + ")")
         center_mtx = np.zeros( (size, size), np.float32 )
@@ -89,6 +162,17 @@ class Kernel:
 
     @classmethod
     def prewitt(cls, normalize: bool = False):
+        '''Prewitt edge detection filter
+
+        Generates an instance of a Prewitt edge detection filter kernel
+        of the specified size
+
+        Args:
+            normalize (bool): If True the kernel will be normalized. Defaults to False.
+
+        Returns:
+            Kernel: Prewitt Kernel
+        '''
         kernel = np.array(  [
                             [-1, 0, 1],
                             [-1, 0, 1],
