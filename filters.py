@@ -119,7 +119,7 @@ class FunctionFilter:
         self.apply = apply    #function to be executed to apply filter
 
 class NonLinear(FunctionFilter):
-    '''Class for non-linear filters. Each filter returns the function that applies it    '''
+    '''Class for non-linear filters. Each filter returns the function that applies it'''
 
     @classmethod
     def median(cls, size):
@@ -129,35 +129,77 @@ class NonLinear(FunctionFilter):
             size (int): Kernel size
 
         Returns:
-            function: medianBlur function
+            NonLinear: NonLinear filter object with the correct apply function set as argument
         '''
         def apply(img):
             return cv.medianBlur(img.img, size)
         return cls(apply)
 
 class Morph(FunctionFilter):
+    '''Class for morphological filters. Each filter returns the function that applies it'''
+    
     # There is room for improvement: add other parameters (border_type, anchor, ...)
 
     @classmethod
     def erode(cls, struct_el, iterations = 1):
+        '''Erosion filter
+
+        Args:
+            struct_el (list | array): structuring element
+            iterations (int): number of iterations of the filter
+
+        Returns:
+            NonLinear: NonLinear filter object with the correct apply function set as argument
+        '''
         def apply(img):
             return cv.erode(img.img, struct_el, iterations = iterations)
         return cls(apply)
 
     @classmethod
     def dilate(cls, struct_el, iterations = 1):
+        '''Dilation filter
+
+        Args:
+            struct_el (list | array): structuring element
+            iterations (int): number of iterations of the filter
+
+        Returns:
+            NonLinear: NonLinear filter object with the correct apply function set as argument
+        '''
         def apply(img):
             return cv.dilate(img.img, struct_el, iterations = iterations)
         return cls(apply)
 
     @classmethod
     def opening(cls, struct_el, iterations = 1):
+        '''Opening filter
+
+        Executes the erosion first and then executes the dilation on the eroded image
+
+        Args:
+            struct_el (list | array): structuring element
+            iterations (int): number of iterations of the filter
+
+        Returns:
+            NonLinear: NonLinear filter object with the correct apply function set as argument
+        '''
         def apply(img):
             return cv.morphologyEx(img.img, cv.MORPH_OPEN, struct_el, iterations = iterations)
         return cls(apply)
 
     @classmethod
     def closing(cls, struct_el, iterations = 1):
+        '''Closing filter
+
+        Executes the dilation first and then executes the erosion on the dilated image 
+
+        Args:
+            struct_el (list | array): structuring element
+            iterations (int): number of iterations of the filter
+
+        Returns:
+            NonLinear: NonLinear filter object with the correct apply function set as argument
+        '''
         def apply(img):
             return cv.morphologyEx(img.img, cv.MORPH_CLOSE, struct_el, iterations = iterations)
         return cls(apply)
