@@ -122,7 +122,10 @@ class Image:
         Returns:
             Image: newly created Image object
         '''
-        ret = cls(cv.imread(path, read_mode))
+        read = cv.imread(path, read_mode)
+        if(read is None):
+            raise Exception("No image at path '" + path + "' was found")
+        ret = cls(read)
         ret.path = path
         ret.extension = path.split('.')[-1] 
         ret.filename = path.split('/')[-1].split('.')[0]
