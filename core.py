@@ -480,6 +480,7 @@ class CameraSource(Image):
         self.release_camera()
 
     def __isOpened(self):
+        '''Check if camera stream is open'''
         return self.camera.isOpened()
 
     def get_next_frame(self):
