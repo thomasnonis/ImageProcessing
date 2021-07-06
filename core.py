@@ -464,7 +464,13 @@ class CameraSource(Image):
                 Defaults to 0.
         '''
         self.camera = cv.VideoCapture(cam)
-        _, current_frame = self.camera.read()
+        if not self.__isOpened():
+            raise Exception("Error opening camera stream")
+
+        ret, current_frame = self.camera.read()
+
+        if not ret:
+            raise Exception("Error getting frame")
 
         super().__init__(current_frame)
 
@@ -472,6 +478,9 @@ class CameraSource(Image):
         '''Release the camera upon object destruction
         '''
         self.release_camera()
+
+    def __isOpened(self):
+        return self.camera.isOpened()
 
     def get_next_frame(self):
         '''Gets the next frame from the camera source
@@ -481,14 +490,19 @@ class CameraSource(Image):
         Returns:
             CameraSource: self
         '''
-        if(self.camera is not None):
-            _, frame = self.camera.read()
+        if(self.__isOpened()):
+            ret, frame = self.camera.read()
+
+            if not ret:
+                raise Exception("Error getting next frame")
+            
             self.img = frame
+                
         return self
 
     def release_camera(self):
         '''Release the camera'''
-        if(self.camera is not None):
+        if(self.__isOpened()):
             self.camera.release()
 
     def make_image(self):
