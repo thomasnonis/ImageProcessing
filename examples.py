@@ -16,18 +16,18 @@ def example_2():
 
 def example_3():
     # Opens a stream from the first camera source on the pc and, until the user presses 'q', shows the real time edge detection using the Canny algorithm
-    img = CameraSource(0)
+    cam = CameraSource(0)
 
     while True:
 
-        img.get_next_frame().make_grayscale().filter(EdgeDetection.canny(60,60)).show("Stream")
+        cam.get_next_frame().make_grayscale().filter(EdgeDetection.canny(60,60)).show("Stream")
         
 
         if (cv.waitKey(5) & 0xFF == ord('q')):
             # press 'q' to quit loop
             break
 
-    img.release_camera()
+    cam.release_camera()
     cv.destroyAllWindows()
 
 def example_4():
