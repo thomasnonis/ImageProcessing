@@ -1,3 +1,7 @@
+'''
+    Author: Thomas Nonis
+'''
+
 import numpy as np
 import cv2 as cv
 
